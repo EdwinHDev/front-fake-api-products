@@ -1,6 +1,11 @@
+import { Login } from "../components/form/Login";
 
-export default function Login() {
+export default function LoginPage() {
   return (
-    <div>Login</div>
+    <main className="container mx-auto px-4">
+      <div className="h-screen flex justify-center items-center">
+        <Login />
+      </div>
+    </main>
   )
 }
