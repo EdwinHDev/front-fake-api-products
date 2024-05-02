@@ -6,9 +6,11 @@ import './index.css'
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { Layout } from './components/layouts/Layout'
 import { AuthLayout } from './components/layouts/AuthLayout'
-import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import NotFountPage from './pages/NotFount'
+import Productos from './pages/Productos'
+import CrearProducto from './pages/CrearProducto'
+import { Toaster } from 'sonner'
 
 const router = createBrowserRouter([
   {
@@ -16,8 +18,12 @@ const router = createBrowserRouter([
     errorElement: <NotFountPage />,
     children: [
       {
-        path: "/",
-        element: <Dashboard />,
+        path: "/productos",
+        element: <Productos />,
+      },
+      {
+        path: "/crear-producto",
+        element: <CrearProducto />,
       }
     ],
   },
@@ -36,6 +42,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <NextUIProvider>
+      <Toaster richColors />
       <RouterProvider router={ router } />
     </NextUIProvider>
   </React.StrictMode>,
