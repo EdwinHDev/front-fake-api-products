@@ -1,6 +1,6 @@
 import { Autocomplete, AutocompleteItem, Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip, useDisclosure } from "@nextui-org/react"
 import { useCallback, useState } from "react"
-import { SubmitHandler, useForm } from "react-hook-form"
+import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { ICharacteristic, IProductCondition, IRating } from "../../interfaces/products";
 import { toast } from "sonner";
 import { DeleteIcon } from "../ui/Icons";
@@ -71,13 +71,14 @@ const conditions = [
 
 export const CreateProduct = () => {
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<LoginForm>()
+  const { register, handleSubmit, formState: { errors }, reset, control, setValue } = useForm<LoginForm>()
   const {isOpen, onOpen, onClose, onOpenChange} = useDisclosure()
 
   const [isLoading, setIsLoading] = useState(false)
   const [characteristicsData, setCharacteristicsData] = useState<Characteristic[]>([])
   const [nameC, setNameC] = useState("");
   const [valueC, setValueC] = useState("");
+  const [characteristicsError, setCharacteristicsError] = useState(false);
   
   const addCharacteristicsData = () => {
     if(nameC === "") {
@@ -93,6 +94,13 @@ export const CreateProduct = () => {
       value: valueC,
     }])
 
+    setValue("characteristics", [...characteristicsData, {
+      name: nameC,
+      value: valueC,
+    }])
+
+    setCharacteristicsError(false)
+
     onClose()
     toast.success(`Se agrego ${nameC}`)
     setNameC("")
@@ -106,6 +114,11 @@ export const CreateProduct = () => {
   }
 
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
+
+    if(!data.characteristics) {
+      setCharacteristicsError(true)
+      return
+    }
 
     setIsLoading(true)
 
@@ -156,8 +169,9 @@ export const CreateProduct = () => {
               <ModalHeader className="flex flex-col gap-1">Agregar Caracteristicas</ModalHeader>
               <ModalBody>
                 <div>
-                  <label htmlFor="nameC" className="text-base text-zinc-500 font-medium">Nombre</label>
+                  <label htmlFor="nameC" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Nombre</label>
                   <Input
+                    aria-label="Nombre"
                     id="nameC"
                     type="text"
                     size="lg"
@@ -169,8 +183,9 @@ export const CreateProduct = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="valueC" className="text-base text-zinc-500 font-medium">Valor</label>
+                  <label htmlFor="valueC" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Valor</label>
                   <Input
+                    aria-label="Valor"
                     id="valueC"
                     type="text"
                     size="lg"
@@ -196,8 +211,9 @@ export const CreateProduct = () => {
       </Modal>
       <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-12 gap-6">
         <div className="col-span-12">
-          <label htmlFor="name" className="text-base text-zinc-500 font-medium">Nombre del producto</label>
+          <label htmlFor="name" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Nombre del producto</label>
           <Textarea
+            aria-label="Nombre del producto"
             id="name"
             size="lg"
             color="primary"
@@ -210,8 +226,9 @@ export const CreateProduct = () => {
           />
         </div>
         <div className="col-span-12">
-          <label htmlFor="description" className="text-base text-zinc-500 font-medium">Descripción del producto</label>
+          <label htmlFor="description" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Descripción del producto</label>
           <Textarea
+            aria-label="Descripción del producto"
             id="description"
             size="lg"
             color="primary"
@@ -224,11 +241,12 @@ export const CreateProduct = () => {
           />
         </div>
         <div className="col-span-12 flex flex-col justify-center">
-          <label htmlFor="description" className="text-base text-zinc-500 font-medium">Caracteristicas del producto</label>
-          <div className="flex justify-center">
+          <label htmlFor="description" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Caracteristicas del producto</label>
+          <div className={`flex justify-center rounded-xl p-2 border-2 ${characteristicsError ? "border-danger-500" : "border-zinc-200"}`}>
             <Table
               aria-label="Caracteristicas del producto"
               className="select-none"
+              removeWrapper
             >
               <TableHeader columns={columns}>
                 {(column) => (
@@ -246,67 +264,99 @@ export const CreateProduct = () => {
               </TableBody>
             </Table>
           </div>
+          {
+            characteristicsError && <p className="text-xs text-danger-500 mt-1 ml-1">Debes incluir al menos una caracteristica</p>
+          }
           <Button
             onPress={onOpen}
             className="mt-6 max-w-max mx-auto"
+            variant="flat"
           >
             Agregar Caracteristica
           </Button>
         </div>
-        <div className="col-span-3">
-          <label htmlFor="category" className="text-base text-zinc-500 font-medium">Categoría</label>
-          <Autocomplete 
-            fullWidth
-            id="category"
-            size="lg"
-            color="primary"
-            variant="bordered"
-            placeholder="Elije una categoría"
-          >
-            {categories.map((category) => (
-              <AutocompleteItem key={category.value} value={category.value}>
-                {category.label}
-              </AutocompleteItem>
-            ))}
-          </Autocomplete>
+        <div className="col-span-12 md:col-span-6 xl:col-span-3">
+          <label htmlFor="category" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Categoría</label>
+          <Controller
+            control={control}
+            {...register("category", { required: "La categoría es requerida"})}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Autocomplete
+                aria-label="Categoría"
+                fullWidth
+                id="category"
+                size="lg"
+                color="primary"
+                variant="bordered"
+                placeholder="Elije una categoría"
+                defaultItems={categories}
+                isInvalid={errors.category ? true : false}
+                errorMessage={errors.category?.message}
+                selectedKey={value}
+                onSelectionChange={onChange}
+                onBlur={onBlur}
+              >
+                {(item) => <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>}
+              </Autocomplete>
+            )}
+          />
         </div>
-        <div className="col-span-3">
-          <label htmlFor="condition" className="text-base text-zinc-500 font-medium">Condición</label>
-          <Autocomplete 
-            fullWidth
-            id="condition"
-            size="lg"
-            color="primary"
-            variant="bordered"
-            placeholder="Elije una condición"
-          >
-            {conditions.map((condition) => (
-              <AutocompleteItem key={condition.value} value={condition.value}>
-                {condition.label}
-              </AutocompleteItem>
-            ))}
-          </Autocomplete>
+        <div className="col-span-12 md:col-span-6 xl:col-span-3">
+          <label htmlFor="condition" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Condición</label>
+          <Controller
+            control={control}
+            {...register("condition", { required: "La condición es requerida"})}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Autocomplete
+                aria-label="Condición"
+                fullWidth
+                id="condition"
+                size="lg"
+                color="primary"
+                variant="bordered"
+                placeholder="Elije una condición"
+                defaultItems={conditions}
+                isInvalid={errors.condition ? true : false}
+                errorMessage={errors.condition?.message}
+                selectedKey={value}
+                onSelectionChange={onChange}
+                onBlur={onBlur}
+              >
+                {(item) => <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>}
+              </Autocomplete>
+            )}
+          />
         </div>
-        <div className="col-span-3">
-          <label htmlFor="subcategories" className="text-base text-zinc-500 font-medium">Sub categoría</label>
-          <Autocomplete 
-            fullWidth
-            id="subcategories"
-            size="lg"
-            color="primary"
-            variant="bordered"
-            placeholder="Elije una sub categoría"
-          >
-            {subCategories.map((subCategory) => (
-              <AutocompleteItem key={subCategory.value} value={subCategory.value}>
-                {subCategory.label}
-              </AutocompleteItem>
-            ))}
-          </Autocomplete>
+        <div className="col-span-12 md:col-span-6 xl:col-span-3">
+          <label htmlFor="subcategories" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Sub categoría</label>
+          <Controller
+            control={control}
+            {...register("subCategories", { required: "La sub categoría es requerida"})}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Autocomplete
+                aria-label="Sub categoría"
+                fullWidth
+                id="subcategories"
+                size="lg"
+                color="primary"
+                variant="bordered"
+                placeholder="Elije una sub categoría"
+                defaultItems={subCategories}
+                isInvalid={errors.subCategories ? true : false}
+                errorMessage={errors.subCategories?.message}
+                selectedKey={value}
+                onSelectionChange={onChange}
+                onBlur={onBlur}
+              >
+                {(item) => <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>}
+              </Autocomplete>
+            )}
+          />
         </div>
-        <div className="col-span-3">
-          <label htmlFor="stock" className="text-base text-zinc-500 font-medium">Stock</label>
+        <div className="col-span-12 md:col-span-6 xl:col-span-3">
+          <label htmlFor="stock" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Stock</label>
           <Input
+            aria-label="Stock"
             id="stock"
             type="number"
             size="lg"
@@ -319,9 +369,10 @@ export const CreateProduct = () => {
             errorMessage={errors.stock?.message}
           />
         </div>
-        <div className="col-span-3">
-          <label htmlFor="price" className="text-base text-zinc-500 font-medium">Precio</label>
+        <div className="col-span-12 md:col-span-6 xl:col-span-3">
+          <label htmlFor="price" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Precio</label>
           <Input
+            aria-label="Precio"
             id="price"
             type="number"
             size="lg"
@@ -334,21 +385,10 @@ export const CreateProduct = () => {
             errorMessage={errors.price?.message}
           />
         </div>
-        <div className="col-span-3">
-          <label htmlFor="discount" className="text-base text-zinc-500 font-medium">Descuento</label>
+        <div className="col-span-12 md:col-span-6 xl:col-span-3">
+          <label htmlFor="company" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Nombre de la empresa</label>
           <Input
-            id="discount"
-            type="number"
-            size="lg"
-            color="primary"
-            variant="bordered"
-            placeholder="Descuento del producto"
-            fullWidth
-          />
-        </div>
-        <div className="col-span-3">
-          <label htmlFor="company" className="text-base text-zinc-500 font-medium">Nombre de la empresa</label>
-          <Input
+            aria-label="Nombre de la empresa"
             id="company"
             type="text"
             size="lg"
@@ -361,13 +401,36 @@ export const CreateProduct = () => {
             errorMessage={errors.companyName?.message}
           />
         </div>
-        <div className="col-span-3">
-          <Switch
-            id="freeShipping"
-            aria-label="Envio gratis"
-          >
-            Envío gratis
-          </Switch>
+        <div className="col-span-12 md:col-span-6 xl:col-span-3">
+          <label htmlFor="discount" className="text-base text-zinc-500 font-medium">Descuento</label>
+          <Input
+            aria-label="Descuento"
+            id="discount"
+            type="number"
+            size="lg"
+            color="primary"
+            variant="bordered"
+            placeholder="Descuento del producto"
+            fullWidth
+            {...register("discount")}
+          />
+        </div>
+        <div className="col-span-12 md:col-span-6 xl:col-span-3">
+          <Controller
+            control={control}
+            {...register("freeShipping")}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Switch
+                id="freeShipping"
+                aria-label="Envio gratis"
+                isSelected={value}
+                onValueChange={onChange}
+                onBlur={onBlur}
+              >
+                Envío gratis
+              </Switch>
+            )}
+          />
         </div>
         <div className="col-span-12 flex justify-center">
             <Button

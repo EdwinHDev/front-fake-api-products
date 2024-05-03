@@ -29,7 +29,7 @@ export const Login = () => {
       <h1 className="text-3xl text-zinc-800 text-center font-black mb-10">Inicio de Sesión</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-12 gap-6 p-6 rounded-2xl bg-white border border-zinc-100 shadow-lg shadow-zinc-100">
         <div className="col-span-12">
-          <label htmlFor="email" className="text-base text-zinc-500 font-medium">Email</label>
+          <label htmlFor="email" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Email</label>
           <Input
             id="email"
             type="email"
@@ -44,7 +44,7 @@ export const Login = () => {
           />
         </div>
         <div className="col-span-12">
-          <label htmlFor="password" className="text-base text-zinc-500 font-medium">Contraseña</label>
+          <label htmlFor="password" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Contraseña</label>
           <Input
             id="password"
             type="password"

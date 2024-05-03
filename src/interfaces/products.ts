@@ -38,8 +38,10 @@ export interface IProduct {
   price: number;
   discount?: number;
   companyName?: string;
+  status?: string;
 
   images: string[];
+  _id?: string;
   
   rating?: IRating;
   freeShipping: boolean;
