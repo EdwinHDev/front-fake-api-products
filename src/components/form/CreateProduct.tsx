@@ -1,7 +1,7 @@
-import { Autocomplete, AutocompleteItem, Button, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip, useDisclosure } from "@nextui-org/react"
+import { Autocomplete, AutocompleteItem, Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip, useDisclosure } from "@nextui-org/react"
 import { useCallback, useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
-import { ICharacteristic, IProductCondition, IRating, ISubCategory } from "../../interfaces/products";
+import { ICharacteristic, IProductCondition, IRating } from "../../interfaces/products";
 import { toast } from "sonner";
 import { DeleteIcon } from "../ui/Icons";
 
@@ -11,7 +11,7 @@ type LoginForm = {
   characteristics: ICharacteristic[];
   condition: IProductCondition;
   category: string;
-  subCategories: ISubCategory[];
+  subCategories: string;
   freeShipping: boolean;
   images: string[];
   stock: number;
