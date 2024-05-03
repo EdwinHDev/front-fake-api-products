@@ -205,7 +205,7 @@ export const Products = () => {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Search by name..."
+            placeholder="Buscar por nombre..."
             startContent={"icono"} // icono de busqueda
             value={filterValue}
             onClear={() => onClear()}
@@ -215,7 +215,7 @@ export const Products = () => {
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={"icono chevron"} variant="flat">
-                  Status
+                  Estado
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -236,7 +236,7 @@ export const Products = () => {
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={"icono chevron"} variant="flat">
-                  Columns
+                  Columnas
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -257,9 +257,9 @@ export const Products = () => {
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {products.length} users</span>
+          <span className="text-default-400 text-small">Total de productos: {products.length}</span>
           <label className="flex items-center text-default-400 text-small">
-            Rows per page:
+            Filas por página:
             <select
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}
@@ -287,8 +287,8 @@ export const Products = () => {
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
           {selectedKeys === "all"
-            ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
+            ? "Todos los productos seleccionados"
+            : `${selectedKeys.size} de ${filteredItems.length} seleccionado`}
         </span>
         <Pagination
           isCompact
