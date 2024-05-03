@@ -1,5 +1,5 @@
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue, Spinner, Button, SortDescriptor, ChipProps, Chip, User, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input} from "@nextui-org/react"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Spinner, Button, SortDescriptor, ChipProps, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input, Selection} from "@nextui-org/react"
+import { Key, useCallback, useEffect, useMemo, useState } from "react"
 import { IProduct } from "../interfaces/products"
 import { capitalize } from "./utils/capitalize";
 
@@ -11,6 +11,7 @@ const columns = [
   {name: "STOCK", uid: "stock", sortable: true},
   {name: "PRECIO", uid: "price", sortable: true},
   {name: "ESTADO", uid: "status", sortable: true},
+  {name: "ACCIONES", uid: "actions", sortable: true},
 ];
 
 const statusOptions = [
@@ -25,7 +26,7 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
   bloqueado: "danger",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["image", "name", "category", "stock", "price", "status"];
+const INITIAL_VISIBLE_COLUMNS = ["image", "name", "category", "stock", "price", "status", "actions"];
 
 export const Products = () => {
   
@@ -80,7 +81,7 @@ export const Products = () => {
     }
     if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
       filteredProducts = filteredProducts.filter((product) =>
-        Array.from(statusFilter).includes(product.status),
+        Array.from(statusFilter).includes(product.status!),
       );
     }
 
@@ -106,44 +107,43 @@ export const Products = () => {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = useCallback((product: IProduct, columnKey: React.Key) => {
-    const cellValue = product[columnKey as keyof IProduct];
+  const renderCell = useCallback((product: IProduct, columnKey: Key) => {
 
     switch (columnKey) {
       case "name":
         return (
           <div>
-            { cellValue }
+            { product.name }
           </div>
         );
       case "image":
         return (
           <div>
-            { cellValue }
+            { product.images[0] }
           </div>
         );
       case "category":
         return (
           <div>
-            { cellValue }
+            { product.category }
           </div>
         );
       case "stock":
         return (
           <div>
-            { cellValue }
+            { product.stock }
           </div>
         );
       case "price":
         return (
           <div>
-            { cellValue }
+            { product.price }
           </div>
         );
       case "status":
         return (
           <Chip className="capitalize" color={statusColorMap[product.status!]} size="sm" variant="flat">
-            {cellValue}
+            {product.status}
           </Chip>
         );
       case "actions":
@@ -164,8 +164,6 @@ export const Products = () => {
             </Dropdown>
           </div>
         );
-      default:
-        return cellValue;
     }
   }, []);
 
