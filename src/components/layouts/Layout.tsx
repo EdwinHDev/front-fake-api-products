@@ -54,12 +54,12 @@ export const Layout = () => {
             </Button>
           </div>
           <div className="p-6 space-y-1">
-            <Link to="/productos" className="block">
+            <Link to="/" className="block">
               <Button
                 fullWidth
-                variant={pathname === "/productos" ? "solid" : "light"}
-                color={pathname === "/productos" ? "primary" : "default"}
-                startContent={<ProductsIcon className={pathname === "/productos" ? "fill-white" : "fill-zinc-500"} />}
+                variant={pathname === "/" ? "solid" : "light"}
+                color={pathname === "/" ? "primary" : "default"}
+                startContent={<ProductsIcon className={pathname === "/" ? "fill-white" : "fill-zinc-500"} />}
                 className="justify-start"
               >
                 Todos los productos

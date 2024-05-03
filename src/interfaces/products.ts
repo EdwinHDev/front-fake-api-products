@@ -27,25 +27,20 @@ export interface IRating {
   star_5: IRatingStar[];
 }
 
-export interface ISubCategory {
-  name: string;
-}
-
 export interface IProduct {
   name: string;
+  description: string;
   category: string;
-  subCategories: ISubCategory[];
+  subCategories: string;
   characteristics: ICharacteristic[];
   condition: IProductCondition;
-  description: string;
-  freeShipping: boolean;
-  images: string[];
   stock: number;
   price: number;
-  
-  _id?: string;
-  companyName?: string;
   discount?: number;
+  companyName?: string;
+
+  images: string[];
+  
   rating?: IRating;
-  status?: IProductStatus;
+  freeShipping: boolean;
 }

@@ -1,4 +1,4 @@
-import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip, useDisclosure } from "@nextui-org/react"
+import { Autocomplete, AutocompleteItem, Button, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip, useDisclosure } from "@nextui-org/react"
 import { useCallback, useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { ICharacteristic, IProductCondition, IRating, ISubCategory } from "../../interfaces/products";
@@ -31,6 +31,43 @@ const columns = [
   {name: "VALOR", uid: "value"},
   {name: "ACCIONES", uid: "actions"},
 ];
+
+const categories = [
+  {label: "Gaming", value: "gaming", description: "Video juegos y todo lo relacionado al mundo gaming"},
+  {label: "Belleza", value: "belleza", description: "Todo para que luzcas mejor"},
+  {label: "Electrodomesticos", value: "electrodomesticos", description: "Todo en electrodomesticos para el hogar"},
+  {label: "Smart Phone", value: "smart phone", description: "Telefonos de todo tipo, disfruta de todas las gamas"},
+  {label: "Computadoras", value: "computadoras", description: "Todo lo que necesitas de computadoras en un mismo lugar"},
+  {label: "Ropa", value: "ropa", description: "Todo lo que buscas en ropa para ellas y para ellos"},
+  {label: "Canzados", value: "calzados", description: "Todo en calzados para ellas y ellos"},
+]
+
+const subCategories = [
+  {label: "Consolas", value: "consolas", description: "Consolas de video juegos"},
+  {label: "Computadoras Gaming", value: "computadoras gaming", description: "Computadoras gaming"},
+  {label: "Cuidado del rostro", value: "cuidado del rostro", description: "Todo tipo de cremas y tonicos"},
+  {label: "Cosmeticos", value: "cosmeticos", description: "Todo es cosmeticos"},
+  {label: "Televisores", value: "televisores", description: "Todo en televisores"},
+  {label: "Lavadoras", value: "lavadoras", description: "Todo en lavadoras"},
+  {label: "Telefonos gama baja", value: "telefonos gama baja", description: "Telefonos gama baja"},
+  {label: "Telefonos gama media", value: "telefonos gama media", description: "Telefonos gama media"},
+  {label: "Telefonos gama alta", value: "telefonos gama alta", description: "Telefonos gama alta"},
+  {label: "Telefonos gaming", value: "telefonos gaming", description: "Telefonos gaming"},
+  {label: "Computadoras profesionales", value: "computadoras profesionales", description: "Computadoras profesionales"},
+  {label: "Computadoras de oficina", value: "computadoras de oficina", description: "Computadoras de oficina"},
+  {label: "Franelas", value: "franelas", description: "Franelas para dama, caballeros y niños"},
+  {label: "Bermudas", value: "bermudas", description: "Bermudas para caballeros y niños"},
+  {label: "Chemise", value: "chemise", description: "Chemise para caballeros y niños"},
+  {label: "Vestidos", value: "vestidos", description: "Vestidos para damas"},
+  {label: "Deportivos", value: "deportivos", description: "Deportivos para ellas y ellos"},
+  {label: "Casuales", value: "casuales", description: "Casuales para ellas y ellos"},
+]
+
+const conditions = [
+  {label: "Nuevo", value: "nuevo", description: "Producto nuevo"},
+  {label: "Usado", value: "usado", description: "Producto usado"},
+  {label: "Como nuevo", value: "como nuevo", description: "Producto en buenas condiciones"},
+]
 
 export const CreateProduct = () => {
 
@@ -187,15 +224,15 @@ export const CreateProduct = () => {
           />
         </div>
         <div className="col-span-12 flex flex-col justify-center">
-          <label htmlFor="description" className="text-base text-zinc-500 font-medium text-center">Descripción del producto</label>
+          <label htmlFor="description" className="text-base text-zinc-500 font-medium">Caracteristicas del producto</label>
           <div className="flex justify-center">
             <Table
               aria-label="Caracteristicas del producto"
-              className="max-w-[500px] select-none"
+              className="select-none"
             >
               <TableHeader columns={columns}>
                 {(column) => (
-                  <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
+                  <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"} className={`${column.name === "ACCIONES" ? "w-40" : "w-auto"}`}>
                     {column.name}
                   </TableColumn>
                 )}
@@ -203,7 +240,7 @@ export const CreateProduct = () => {
               <TableBody emptyContent="No hay caracteristicas" items={characteristicsData}>
                 {(item) => (
                   <TableRow key={item.name}>
-                    {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                    {(columnKey) => <TableCell className={`${columnKey === "actions" ? "w-40" : "w-auto"}`}>{renderCell(item, columnKey)}</TableCell>}
                   </TableRow>
                 )}
               </TableBody>
@@ -216,51 +253,122 @@ export const CreateProduct = () => {
             Agregar Caracteristica
           </Button>
         </div>
-        {/* <div className="col-span-3">
-          <label htmlFor="email" className="text-base text-zinc-500 font-medium">Email</label>
-          <Input
-            id="email"
-            type="email"
+        <div className="col-span-3">
+          <label htmlFor="category" className="text-base text-zinc-500 font-medium">Categoría</label>
+          <Autocomplete 
+            fullWidth
+            id="category"
             size="lg"
             color="primary"
             variant="bordered"
-            placeholder="Introduce tu email"
+            placeholder="Elije una categoría"
+          >
+            {categories.map((category) => (
+              <AutocompleteItem key={category.value} value={category.value}>
+                {category.label}
+              </AutocompleteItem>
+            ))}
+          </Autocomplete>
+        </div>
+        <div className="col-span-3">
+          <label htmlFor="condition" className="text-base text-zinc-500 font-medium">Condición</label>
+          <Autocomplete 
             fullWidth
-            {...register("email", { required: "El email es requerido", pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "El email es inválido" }})}
-            isInvalid={errors.email ? true : false}
-            errorMessage={errors.email?.message}
+            id="condition"
+            size="lg"
+            color="primary"
+            variant="bordered"
+            placeholder="Elije una condición"
+          >
+            {conditions.map((condition) => (
+              <AutocompleteItem key={condition.value} value={condition.value}>
+                {condition.label}
+              </AutocompleteItem>
+            ))}
+          </Autocomplete>
+        </div>
+        <div className="col-span-3">
+          <label htmlFor="subcategories" className="text-base text-zinc-500 font-medium">Sub categoría</label>
+          <Autocomplete 
+            fullWidth
+            id="subcategories"
+            size="lg"
+            color="primary"
+            variant="bordered"
+            placeholder="Elije una sub categoría"
+          >
+            {subCategories.map((subCategory) => (
+              <AutocompleteItem key={subCategory.value} value={subCategory.value}>
+                {subCategory.label}
+              </AutocompleteItem>
+            ))}
+          </Autocomplete>
+        </div>
+        <div className="col-span-3">
+          <label htmlFor="stock" className="text-base text-zinc-500 font-medium">Stock</label>
+          <Input
+            id="stock"
+            type="number"
+            size="lg"
+            color="primary"
+            variant="bordered"
+            placeholder="Unidades en Stock"
+            fullWidth
+            {...register("stock", { required: "El stock es requerido" })}
+            isInvalid={errors.stock ? true : false}
+            errorMessage={errors.stock?.message}
           />
         </div>
         <div className="col-span-3">
-          <label htmlFor="email" className="text-base text-zinc-500 font-medium">Email</label>
+          <label htmlFor="price" className="text-base text-zinc-500 font-medium">Precio</label>
           <Input
-            id="email"
-            type="email"
+            id="price"
+            type="number"
             size="lg"
             color="primary"
             variant="bordered"
-            placeholder="Introduce tu email"
+            placeholder="Precio del producto"
             fullWidth
-            {...register("email", { required: "El email es requerido", pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "El email es inválido" }})}
-            isInvalid={errors.email ? true : false}
-            errorMessage={errors.email?.message}
+            {...register("price", { required: "El precio es requerido" })}
+            isInvalid={errors.price ? true : false}
+            errorMessage={errors.price?.message}
           />
         </div>
         <div className="col-span-3">
-          <label htmlFor="email" className="text-base text-zinc-500 font-medium">Email</label>
+          <label htmlFor="discount" className="text-base text-zinc-500 font-medium">Descuento</label>
           <Input
-            id="email"
-            type="email"
+            id="discount"
+            type="number"
             size="lg"
             color="primary"
             variant="bordered"
-            placeholder="Introduce tu email"
+            placeholder="Descuento del producto"
             fullWidth
-            {...register("email", { required: "El email es requerido", pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "El email es inválido" }})}
-            isInvalid={errors.email ? true : false}
-            errorMessage={errors.email?.message}
           />
-        </div> */}
+        </div>
+        <div className="col-span-3">
+          <label htmlFor="company" className="text-base text-zinc-500 font-medium">Nombre de la empresa</label>
+          <Input
+            id="company"
+            type="text"
+            size="lg"
+            color="primary"
+            variant="bordered"
+            placeholder="Nombre de la empresa"
+            fullWidth
+            {...register("companyName", { required: "El precio es requerido" })}
+            isInvalid={errors.companyName ? true : false}
+            errorMessage={errors.companyName?.message}
+          />
+        </div>
+        <div className="col-span-3">
+          <Switch
+            id="freeShipping"
+            aria-label="Envio gratis"
+          >
+            Envío gratis
+          </Switch>
+        </div>
         <div className="col-span-12 flex justify-center">
             <Button
               variant="shadow"
