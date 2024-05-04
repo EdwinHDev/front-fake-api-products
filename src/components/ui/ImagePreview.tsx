@@ -38,10 +38,10 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ setImages, error, images })
 
   const deleteImage = (index: number) => {
 
-    const updateImagesPreviews = imagePreviews.filter((image, i) => i !== index)
+    const updateImagesPreviews = imagePreviews.filter((_image, i) => i !== index)
     setImagePreviews(updateImagesPreviews)
 
-    const updateImagesFile = saveFiles.filter((file, i) => i !== index)
+    const updateImagesFile = saveFiles.filter((_file, i) => i !== index)
     setSaveFiles(updateImagesFile)
     setImages(updateImagesFile)
   }
