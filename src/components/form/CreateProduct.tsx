@@ -1,9 +1,13 @@
 import { Autocomplete, AutocompleteItem, Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip, useDisclosure } from "@nextui-org/react"
 import { useCallback, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
-import { ICharacteristic, IProductCondition, IRating } from "../../interfaces/products";
-import { toast } from "sonner";
-import { DeleteIcon } from "../ui/Icons";
+import { ICharacteristic, IProductCondition, IRating } from "../../interfaces/products"
+import { toast } from "sonner"
+import { DeleteIcon } from "../ui/Icons"
+import ImagePreview from "../ui/ImagePreview"
+import { createProduct, uploadImages } from "../../services/products_services"
+import { fillProductRating } from "../utils/ramdomRating"
+import { clients, comments } from "../utils/dataRating"
 
 type LoginForm = {
   name: string;
@@ -13,7 +17,7 @@ type LoginForm = {
   category: string;
   subCategories: string;
   freeShipping: boolean;
-  images: string[];
+  images: File[];
   stock: number;
   price: number;
   companyName?: string;
@@ -30,7 +34,7 @@ const columns = [
   {name: "NOMBRE", uid: "name"},
   {name: "VALOR", uid: "value"},
   {name: "ACCIONES", uid: "actions"},
-];
+]
 
 const categories = [
   {label: "Gaming", value: "gaming", description: "Video juegos y todo lo relacionado al mundo gaming"},
@@ -76,9 +80,9 @@ export const CreateProduct = () => {
 
   const [isLoading, setIsLoading] = useState(false)
   const [characteristicsData, setCharacteristicsData] = useState<Characteristic[]>([])
-  const [nameC, setNameC] = useState("");
-  const [valueC, setValueC] = useState("");
-  const [characteristicsError, setCharacteristicsError] = useState(false);
+  const [nameC, setNameC] = useState("")
+  const [valueC, setValueC] = useState("")
+  const [characteristicsError, setCharacteristicsError] = useState(false)
   
   const addCharacteristicsData = () => {
     if(nameC === "") {
@@ -122,15 +126,52 @@ export const CreateProduct = () => {
 
     setIsLoading(true)
 
-    setTimeout(() => {
+    const urlList: string[] = []
+    type imageResType = {
+      name: string
+      size: number
+      type: string
+      url: string
+    }
+
+    try {
+      const res = await uploadImages(data.images)
+      res.map((image: imageResType) => {
+        urlList.push(image.url)
+      })
+    } catch (error) {
+      console.log(error)
       setIsLoading(false)
-      console.log(data)
+    }
+
+    try {
+      const res = await createProduct({
+        category: data.category,
+        characteristics: data.characteristics,
+        condition: data.condition,
+        description: data.description,
+        freeShipping: data.freeShipping,
+        name: data.name,
+        price: data.price,
+        stock: data.stock,
+        subCategories: data.subCategories,
+        companyName: data.companyName,
+        discount: data.discount,
+        status: "publicado",
+        images: urlList,
+        rating: fillProductRating(clients, comments)
+      })
+      setIsLoading(false)
+      setCharacteristicsData([])
       reset()
-    }, 3000);
+      toast.success(res.message)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const renderCell = useCallback((characteristic: Characteristic, columnKey: React.Key) => {
-    const cellValue = characteristic[columnKey as keyof Characteristic];
+    const cellValue = characteristic[columnKey as keyof Characteristic]
 
     switch (columnKey) {
       case "name":
@@ -138,13 +179,13 @@ export const CreateProduct = () => {
           <div>
             { cellValue }
           </div>
-        );
+        )
       case "value":
         return (
           <div>
             { cellValue }
           </div>
-        );
+        )
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
@@ -154,11 +195,11 @@ export const CreateProduct = () => {
               </span>
             </Tooltip>
           </div>
-        );
+        )
       default:
-        return cellValue;
+        return cellValue
     }
-  }, []);
+  }, [])
 
   return (
     <>
@@ -244,6 +285,7 @@ export const CreateProduct = () => {
           <label htmlFor="description" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Caracteristicas del producto</label>
           <div className={`flex justify-center rounded-xl p-2 border-2 ${characteristicsError ? "border-danger-500" : "border-zinc-200"}`}>
             <Table
+              {...register("characteristics", { required: "Debes agregar al menos una caracteristica"})}
               aria-label="Caracteristicas del producto"
               className="select-none"
               removeWrapper
@@ -264,9 +306,7 @@ export const CreateProduct = () => {
               </TableBody>
             </Table>
           </div>
-          {
-            characteristicsError && <p className="text-xs text-danger-500 mt-1 ml-1">Debes incluir al menos una caracteristica</p>
-          }
+          {characteristicsError && <p className="text-xs text-danger-500 mt-1 ml-1">Debes agregar al menos una caracteristica</p>}
           <Button
             onPress={onOpen}
             className="mt-6 max-w-max mx-auto"
@@ -280,8 +320,9 @@ export const CreateProduct = () => {
           <Controller
             control={control}
             {...register("category", { required: "La categoría es requerida"})}
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field: { onChange, onBlur, value, ref } }) => (
               <Autocomplete
+                ref={ref}
                 aria-label="Categoría"
                 fullWidth
                 id="category"
@@ -306,8 +347,9 @@ export const CreateProduct = () => {
           <Controller
             control={control}
             {...register("condition", { required: "La condición es requerida"})}
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field: { onChange, onBlur, value, ref } }) => (
               <Autocomplete
+                ref={ref}
                 aria-label="Condición"
                 fullWidth
                 id="condition"
@@ -332,8 +374,9 @@ export const CreateProduct = () => {
           <Controller
             control={control}
             {...register("subCategories", { required: "La sub categoría es requerida"})}
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field: { onChange, onBlur, value, ref } }) => (
               <Autocomplete
+                ref={ref}
                 aria-label="Sub categoría"
                 fullWidth
                 id="subcategories"
@@ -396,7 +439,7 @@ export const CreateProduct = () => {
             variant="bordered"
             placeholder="Nombre de la empresa"
             fullWidth
-            {...register("companyName", { required: "El precio es requerido" })}
+            {...register("companyName", { required: "El nombre de la empresa es requerido" })}
             isInvalid={errors.companyName ? true : false}
             errorMessage={errors.companyName?.message}
           />
@@ -419,8 +462,9 @@ export const CreateProduct = () => {
           <Controller
             control={control}
             {...register("freeShipping")}
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field: { onChange, onBlur, value, ref } }) => (
               <Switch
+                ref={ref}
                 id="freeShipping"
                 aria-label="Envio gratis"
                 isSelected={value}
@@ -431,6 +475,20 @@ export const CreateProduct = () => {
               </Switch>
             )}
           />
+        </div>
+        <div className="col-span-12 mb-10">
+          <label htmlFor="discount" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Imagenes</label>
+          <div className="mt-2 w-full">
+            {/* <ImagePreview setImages={setImagesData} /> */}
+            <Controller
+              control={control}
+              {...register("images", { required: "Las imagenes son requeridas" })}
+              render={({ field: { onChange, value } }) => (
+                <ImagePreview setImages={onChange} images={value} error={errors.images ? true : false} />
+              )}
+            />
+            {errors.images && <p className="text-xs text-danger-500 mt-1 ml-1">{ errors.images?.message }</p>}
+          </div>
         </div>
         <div className="col-span-12 flex justify-center">
             <Button

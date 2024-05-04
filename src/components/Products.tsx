@@ -112,14 +112,14 @@ export const Products = () => {
     switch (columnKey) {
       case "name":
         return (
-          <div>
+          <div className="line-clamp-3">
             { product.name }
           </div>
         );
       case "image":
         return (
-          <div>
-            { product.images[0] }
+          <div className="w-16 h-16 overflow-hidden">
+            <img src={ product.images[0] } alt={ product.name } />
           </div>
         );
       case "category":
