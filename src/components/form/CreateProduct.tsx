@@ -319,10 +319,10 @@ export const CreateProduct = () => {
           <label htmlFor="category" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Categoría</label>
           <Controller
             control={control}
-            {...register("category", { required: "La categoría es requerida"})}
-            render={({ field: { onChange, onBlur, value, ref } }) => (
+            name="category"
+            defaultValue=""
+            render={({ field }) => (
               <Autocomplete
-                ref={ref}
                 aria-label="Categoría"
                 fullWidth
                 id="category"
@@ -331,11 +331,9 @@ export const CreateProduct = () => {
                 variant="bordered"
                 placeholder="Elije una categoría"
                 defaultItems={categories}
-                isInvalid={errors.category ? true : false}
-                errorMessage={errors.category?.message}
-                selectedKey={value}
-                onSelectionChange={onChange}
-                onBlur={onBlur}
+                selectedKey={field.value}
+                onSelectionChange={field.onChange}
+                onBlur={field.onBlur}
               >
                 {(item) => <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>}
               </Autocomplete>
@@ -346,11 +344,11 @@ export const CreateProduct = () => {
           <label htmlFor="condition" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Condición</label>
           <Controller
             control={control}
-            {...register("condition", { required: "La condición es requerida"})}
-            render={({ field: { onChange, onBlur, value, ref } }) => (
+            name="condition"
+            defaultValue="nuevo"
+            render={({ field }) => (
               <Autocomplete
-                ref={ref}
-                aria-label="Condición"
+                aria-label="Categoría"
                 fullWidth
                 id="condition"
                 size="lg"
@@ -358,11 +356,9 @@ export const CreateProduct = () => {
                 variant="bordered"
                 placeholder="Elije una condición"
                 defaultItems={conditions}
-                isInvalid={errors.condition ? true : false}
-                errorMessage={errors.condition?.message}
-                selectedKey={value}
-                onSelectionChange={onChange}
-                onBlur={onBlur}
+                selectedKey={field.value}
+                onSelectionChange={field.onChange}
+                onBlur={field.onBlur}
               >
                 {(item) => <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>}
               </Autocomplete>
@@ -373,23 +369,21 @@ export const CreateProduct = () => {
           <label htmlFor="subcategories" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Sub categoría</label>
           <Controller
             control={control}
-            {...register("subCategories", { required: "La sub categoría es requerida"})}
-            render={({ field: { onChange, onBlur, value, ref } }) => (
+            name="subCategories"
+            defaultValue=""
+            render={({ field }) => (
               <Autocomplete
-                ref={ref}
                 aria-label="Sub categoría"
                 fullWidth
-                id="subcategories"
+                id="subCategories"
                 size="lg"
                 color="primary"
                 variant="bordered"
                 placeholder="Elije una sub categoría"
                 defaultItems={subCategories}
-                isInvalid={errors.subCategories ? true : false}
-                errorMessage={errors.subCategories?.message}
-                selectedKey={value}
-                onSelectionChange={onChange}
-                onBlur={onBlur}
+                selectedKey={field.value}
+                onSelectionChange={field.onChange}
+                onBlur={field.onBlur}
               >
                 {(item) => <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>}
               </Autocomplete>
@@ -459,34 +453,54 @@ export const CreateProduct = () => {
           />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-3">
-          <Controller
+        <Controller
             control={control}
-            {...register("freeShipping")}
-            render={({ field: { onChange, onBlur, value, ref } }) => (
+            name="freeShipping"
+            render={({ field }) => (
               <Switch
-                ref={ref}
                 id="freeShipping"
                 aria-label="Envio gratis"
-                isSelected={value}
-                onValueChange={onChange}
-                onBlur={onBlur}
+                isSelected={field.value}
+                onValueChange={field.onChange}
+                onBlur={field.onBlur}
               >
                 Envío gratis
               </Switch>
             )}
           />
+          {/* <Controller
+            control={control}
+            {...register("freeShipping")}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Switch
+                id="freeShipping"
+                aria-label="Envio gratis"
+                isSelected={field.value}
+                onValueChange={field.onChange}
+                onBlur={field.onBlur}
+              >
+                Envío gratis
+              </Switch>
+            )}
+          /> */}
         </div>
         <div className="col-span-12 mb-10">
           <label htmlFor="discount" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Imagenes</label>
           <div className="mt-2 w-full">
-            {/* <ImagePreview setImages={setImagesData} /> */}
             <Controller
+              control={control}
+              name="images"
+              render={({ field }) => (
+                <ImagePreview setImages={field.onChange} images={field.value} error={errors.images ? true : false} />
+              )}
+            />
+            {/* <Controller
               control={control}
               {...register("images", { required: "Las imagenes son requeridas" })}
               render={({ field: { onChange, value } }) => (
                 <ImagePreview setImages={onChange} images={value} error={errors.images ? true : false} />
               )}
-            />
+            /> */}
             {errors.images && <p className="text-xs text-danger-500 mt-1 ml-1">{ errors.images?.message }</p>}
           </div>
         </div>
