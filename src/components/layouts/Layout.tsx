@@ -7,8 +7,6 @@ export const Layout = () => {
 
   const { pathname } = useLocation()
 
-  console.log(pathname)
-
   const [colapse, setColapse] = useState(false)
 
   return (

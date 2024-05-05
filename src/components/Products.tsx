@@ -50,8 +50,6 @@ export const Products = () => {
         const res = await fetch(url)
         const products = await res.json()
 
-        console.log(products)
-
         setIsLoading(false)
 
         if (Array.isArray(products) && products.length > 0) {

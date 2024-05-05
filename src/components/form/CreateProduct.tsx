@@ -210,10 +210,10 @@ export const CreateProduct = () => {
               <ModalHeader className="flex flex-col gap-1">Agregar Caracteristicas</ModalHeader>
               <ModalBody>
                 <div>
-                  <label htmlFor="nameC" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Nombre</label>
+                  <label htmlFor="name-c" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Nombre</label>
                   <Input
                     aria-label="Nombre"
-                    id="nameC"
+                    id="name-c"
                     type="text"
                     size="lg"
                     color="primary"
@@ -224,10 +224,10 @@ export const CreateProduct = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="valueC" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Valor</label>
+                  <label htmlFor="value-c" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Valor</label>
                   <Input
                     aria-label="Valor"
-                    id="valueC"
+                    id="value-c"
                     type="text"
                     size="lg"
                     color="primary"
@@ -282,7 +282,7 @@ export const CreateProduct = () => {
           />
         </div>
         <div className="col-span-12 flex flex-col justify-center">
-          <label htmlFor="description" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Caracteristicas del producto</label>
+          <label className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Caracteristicas del producto</label>
           <div className={`flex justify-center rounded-xl p-2 border-2 ${characteristicsError ? "border-danger-500" : "border-zinc-200"}`}>
             <Table
               {...register("characteristics", { required: "Debes agregar al menos una caracteristica"})}
@@ -375,7 +375,7 @@ export const CreateProduct = () => {
               <Autocomplete
                 aria-label="Sub categoría"
                 fullWidth
-                id="subCategories"
+                id="subcategories"
                 size="lg"
                 color="primary"
                 variant="bordered"
@@ -485,7 +485,7 @@ export const CreateProduct = () => {
           /> */}
         </div>
         <div className="col-span-12 mb-10">
-          <label htmlFor="discount" className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Imagenes</label>
+          <label className="text-base text-zinc-500 font-medium after:content-['*'] after:ml-0.5 after:text-red-500">Imagenes</label>
           <div className="mt-2 w-full">
             <Controller
               control={control}
