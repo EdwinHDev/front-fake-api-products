@@ -5,7 +5,7 @@ export const createProduct = async (data: IProduct) => {
     const res = await fetch("https://fake-api-products-sigma.vercel.app/api/products", {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(data)
     })
@@ -27,6 +27,9 @@ export const uploadImages = async (images: File[]) => {
   try {
     const res = await fetch("https://fake-api-products-sigma.vercel.app/api/upload", {
       method: "POST",
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
       body: formData
     })
     const imagesUrl = await res.json()
