@@ -37,13 +37,11 @@ export const Products = () => {
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "age",
+    column: "name",
     direction: "ascending",
   });
-  const [products, setProducts] = useState<IProduct[]>([])
+  const [productsData, setProductsData] = useState<IProduct[]>([])
   const [isLoadind, setIsLoading] = useState(true)
-
-  console.log(products)
 
   useEffect(() => {
     const getProducts = async () => {
@@ -52,8 +50,16 @@ export const Products = () => {
         const res = await fetch(url)
         const products = await res.json()
 
-        setProducts(products)
+        console.log(products)
+
         setIsLoading(false)
+
+        if (Array.isArray(products) && products.length > 0) {
+          setProductsData(products);
+        } else {
+          setProductsData([]);
+        }
+
       } catch (error) {
         console.log(error)
         setIsLoading(false)
@@ -72,11 +78,11 @@ export const Products = () => {
   }, [visibleColumns]);
 
   const filteredItems = useMemo(() => {
-    let filteredProducts = [...products];
+    let filteredProducts: IProduct[] = [...productsData];
 
     if (hasSearchFilter) {
-      filteredProducts = filteredProducts.filter((user) =>
-        user.name.toLowerCase().includes(filterValue.toLowerCase()),
+      filteredProducts = filteredProducts.filter((product) =>
+        product.name.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
     if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
@@ -86,7 +92,7 @@ export const Products = () => {
     }
 
     return filteredProducts;
-  }, [products, filterValue, statusFilter]);
+  }, [productsData, filterValue, statusFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -257,7 +263,7 @@ export const Products = () => {
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total de productos: {products.length}</span>
+          <span className="text-default-400 text-small">Total de productos: {productsData.length}</span>
           <label className="flex items-center text-default-400 text-small">
             Filas por página:
             <select
@@ -278,7 +284,7 @@ export const Products = () => {
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
-    products.length,
+    productsData.length,
     hasSearchFilter,
   ]);
 
@@ -337,7 +343,7 @@ export const Products = () => {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody isLoading={isLoadind} loadingContent={<Spinner />} emptyContent={"No users found"} items={sortedItems}>
+      <TableBody isLoading={isLoadind} loadingContent={<Spinner />} emptyContent={"No hay productos para mostrar"} items={sortedItems}>
         {(item) => (
           <TableRow key={item._id}>
             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
