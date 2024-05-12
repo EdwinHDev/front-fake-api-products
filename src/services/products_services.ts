@@ -1,40 +1,31 @@
+import { API, FileAPI } from "../API/baseAPI"
 import { IProduct } from "../interfaces/products"
 
-export const createProduct = async (data: IProduct) => {
+export const createProduct = async (products: IProduct) => {
+
   try {
-    const res = await fetch("https://fake-api-products-sigma.vercel.app/api/products", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    })
-    const registered = await res.json()
-    console.log(registered)
-    return registered
-  } catch (error) {
-    console.log(error)
+    const { data } = await API.post("/products", products)
+    console.log(data)
+    return data
+  } catch (error: any) {
+    throw error.response.data.message
   }
 }
 
 export const uploadImages = async (images: File[]) => {
 
   const formData = new FormData();
-  images.forEach((file, index) => {
-    formData.append(`file${index}`, file);
-  });
+  for (let i = 0; i < images.length; i++) {
+    formData.append('images', images[i]);
+  }
 
   try {
-    const res = await fetch("https://fake-api-products-sigma.vercel.app/api/upload", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      body: formData
-    })
-    const imagesUrl = await res.json()
-    return imagesUrl
-  } catch (error) {
+    const { data } = await FileAPI.post("/upload", formData)
+
+    console.log(data)
+    return data
+  } catch (error: any) {
     console.log(error)
+    throw error.response.data.message
   }
 }

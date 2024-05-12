@@ -1,7 +1,7 @@
 import { Autocomplete, AutocompleteItem, Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip, useDisclosure } from "@nextui-org/react"
 import { useCallback, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
-import { ICharacteristic, IProductCondition, IRating } from "../../interfaces/products"
+import { ICharacteristic, IImages, IProductCondition, IRating } from "../../interfaces/products"
 import { toast } from "sonner"
 import { DeleteIcon } from "../ui/Icons"
 import ImagePreview from "../ui/ImagePreview"
@@ -126,22 +126,17 @@ export const CreateProduct = () => {
 
     setIsLoading(true)
 
-    const urlList: string[] = []
-    type imageResType = {
-      name: string
-      size: number
-      type: string
-      url: string
-    }
+    let urlList: IImages[] = []
 
     try {
       const res = await uploadImages(data.images)
-      res.map((image: imageResType) => {
-        urlList.push(image.url)
-      })
-    } catch (error) {
+      console.log(res.data)
+      urlList = res.data
+    } catch (error: any) {
       console.log(error)
       setIsLoading(false)
+      toast.error(error)
+      return
     }
 
     try {
@@ -165,8 +160,9 @@ export const CreateProduct = () => {
       setCharacteristicsData([])
       reset()
       toast.success(res.message)
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
+      toast.error(error.message)
     }
   }
 

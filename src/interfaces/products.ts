@@ -18,6 +18,13 @@ export interface IRatingStar {
   date: string;
 }
 
+export interface IImages {
+  original: string;
+  small: string;
+  medium: string;
+  large: string;
+}
+
 export interface IRating {
   product_id?: string;
   star_1: IRatingStar[];
@@ -40,7 +47,7 @@ export interface IProduct {
   companyName?: string;
   status?: string;
 
-  images: string[];
+  images: IImages[];
   _id?: string;
   
   rating?: IRating;

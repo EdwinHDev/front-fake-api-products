@@ -123,7 +123,7 @@ export const Products = () => {
       case "image":
         return (
           <div className="w-16 h-16 overflow-hidden">
-            <img src={ product.images[0] } alt={ product.name } />
+            <img src={ product.images[0].small } alt={ product.name } />
           </div>
         );
       case "category":
